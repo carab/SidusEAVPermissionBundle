@@ -1,0 +1,8 @@
+services:
+    sidus_eav_permission.form.attribute_builder:
+        class: Sidus\EAVPermissionBundle\Form\AttributePermissionFormHandler
+        decorates: sidus_eav_model.form.attribute_builder
+        arguments:
+            - '@sidus_eav_permission.form.attribute_builder.inner'
+            - '@security.token_storage'
+            - '@security.authorization_checker'

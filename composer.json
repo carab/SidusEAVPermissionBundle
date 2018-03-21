@@ -1,0 +1,30 @@
+{
+    "name": "sidus/eav-permission-bundle",
+    "description": "Integrates attribute-level permissions based on roles for the Sidus/EAVModelBundle",
+    "keywords": [
+        "eav",
+        "permissions",
+        "roles"
+    ],
+    "homepage": "https://github.com/VincentChalnot/SidusEAVPermissionBundle",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Vincent Chalnot",
+            "email": "vincent@sidus.fr",
+            "homepage": "http://chalnot.fr",
+            "role": "Developer"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Sidus\\EAVPermissionBundle\\": ""
+        }
+    },
+    "require": {
+        "php": ">=5.6",
+        "symfony/symfony": "^3.0|^2.8",
+        "sidus/eav-model-bundle": "1.2.*"
+    }
+}

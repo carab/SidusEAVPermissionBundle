@@ -1,0 +1,7 @@
+services:
+    sidus_eav_permission.voter.attribute:
+        class: Sidus\EAVPermissionBundle\Voter\AttributeVoter
+        arguments:
+            - '@security.access.role_hierarchy_voter'
+        tags:
+            - { name: security.voter }
