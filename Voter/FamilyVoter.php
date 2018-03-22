@@ -10,18 +10,18 @@
 
 namespace Sidus\EAVPermissionBundle\Voter;
 
-use Sidus\EAVModelBundle\Model\AttributeInterface;
+use Sidus\EAVModelBundle\Model\FamilyInterface;
 use Sidus\EAVPermissionBundle\Security\Permission;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
 /**
- * Checks if an attribute is readable or editable
+ * Allows the access to a family based on the family permissions of a user.
  *
  * @author Vincent Chalnot <vincent@sidus.fr>
  */
-class AttributeVoter implements VoterInterface
+class FamilyVoter implements VoterInterface
 {
     /** @var AccessDecisionManagerInterface */
     protected $decisionManager;
@@ -42,21 +42,25 @@ class AttributeVoter implements VoterInterface
     public function vote(TokenInterface $token, $object, array $attributes)
     {
         $result = VoterInterface::ACCESS_ABSTAIN;
-        if (!$object instanceof AttributeInterface) {
+
+        if (!$object instanceof FamilyInterface) {
             return $result;
         }
-        $permissions = $object->getOption('permissions');
-        if (empty($permissions)) {
-            return VoterInterface::ACCESS_GRANTED; // No permissions means always editable (thus readable)
+
+        if (!array_key_exists('permissions', $object->getOptions())) {
+            return VoterInterface::ACCESS_GRANTED; // No permissions means access is granted
         }
 
+        $permissions = $object->getOptions()['permissions'];
+
+        $result = VoterInterface::ACCESS_DENIED;
         foreach ($attributes as $attribute) {
-            if (!\in_array($attribute, [Permission::EDIT, Permission::READ], true)) {
-                throw new \UnexpectedValueException('Unsupported Attribute permission type '.$attribute);
+            if (!\in_array($attribute, Permission::getPermissions(), true)) {
+                throw new \UnexpectedValueException("Invalid permission '{$attribute}'");
             }
 
             if (!array_key_exists($attribute, $permissions)) {
-                return VoterInterface::ACCESS_GRANTED; // Always grant undefined permissions
+                return VoterInterface::ACCESS_GRANTED; // No permissions means access is granted
             }
 
             if ($this->decisionManager->decide($token, (array) $permissions[$attribute])) {
@@ -64,6 +68,6 @@ class AttributeVoter implements VoterInterface
             }
         }
 
-        return VoterInterface::ACCESS_DENIED;
+        return $result;
     }
 }

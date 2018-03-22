@@ -12,12 +12,15 @@ namespace Sidus\EAVPermissionBundle\Form;
 
 use Sidus\EAVModelBundle\Form\AttributeFormBuilderInterface;
 use Sidus\EAVModelBundle\Model\AttributeInterface;
+use Sidus\EAVPermissionBundle\Security\Permission;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 /**
  * Overrides base attribute form builder to handle permissions
+ *
+ * @author Vincent Chalnot <vincent@sidus.fr>
  */
 class AttributePermissionFormHandler implements AttributeFormBuilderInterface
 {
@@ -57,10 +60,11 @@ class AttributePermissionFormHandler implements AttributeFormBuilderInterface
         AttributeInterface $attribute,
         array $options = []
     ) {
-        if (!$this->authorizationChecker->isGranted('read', $attribute)) {
+        // Not (Read OR edit)
+        if (!$this->authorizationChecker->isGranted([Permission::READ, Permission::EDIT], $attribute)) {
             return;
         }
-        if (!$this->authorizationChecker->isGranted('edit', $attribute)) {
+        if (!$this->authorizationChecker->isGranted(Permission::EDIT, $attribute)) {
             $options['form_options']['disabled'] = true;
         }
 
